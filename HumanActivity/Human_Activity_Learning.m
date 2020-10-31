@@ -80,8 +80,13 @@ classificationLearner
 T_mean = varfun(@Wmean, rawSensorDataTrain);
 T_stdv = varfun(@Wstd,rawSensorDataTrain);
 T_pca  = varfun(@Wpca1,rawSensorDataTrain);
+T_aad = varfun(@AverageAbsoluteDistance,rawSensorDataTrain);
+T_ara  = varfun(@AverageResultantAcceleration,rawSensorDataTrain);
+T_bd = varfun(@BinnedDistribution,rawSensorDataTrain);
+T_tbp  = varfun(@TimeBetweenPeaks,rawSensorDataTrain);
 
-humanActivityData = [T_mean, T_stdv, T_pca];
+
+humanActivityData = [T_mean, T_stdv, T_pca, T_aad, T_ara, T_bd, T_tbp];
 humanActivityData.activity = trainActivity;
 
 %% Use the new features to train a model and assess its performance 
@@ -105,8 +110,13 @@ rawSensorDataTest = table(...
 T_mean = varfun(@Wmean, rawSensorDataTest);
 T_stdv = varfun(@Wstd,rawSensorDataTest);
 T_pca  = varfun(@Wpca1,rawSensorDataTest);
+T_aad = varfun(@AverageAbsoluteDistance,rawSensorDataTest);
+T_ara  = varfun(@AverageResultantAcceleration,rawSensorDataTest);
+T_bd = varfun(@BinnedDistribution,rawSensorDataTest);
+T_tbp  = varfun(@TimeBetweenPeaks,rawSensorDataTest);
 
-humanActivityData = [T_mean, T_stdv, T_pca];
+
+humanActivityData = [T_mean, T_stdv, T_pca, T_aad, T_ara, T_bd, T_tbp];
 humanActivityData.activity = testActivity;
 
 % Step 3: Use trained model to predict activity on new sensor data
