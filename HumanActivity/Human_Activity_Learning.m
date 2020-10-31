@@ -80,13 +80,22 @@ classificationLearner
 T_mean = varfun(@Wmean, rawSensorDataTrain);
 T_stdv = varfun(@Wstd,rawSensorDataTrain);
 T_pca  = varfun(@Wpca1,rawSensorDataTrain);
-T_aad = varfun(@AverageAbsoluteDistance,rawSensorDataTrain);
-T_ara  = varfun(@AverageResultantAcceleration,rawSensorDataTrain);
-T_bd = varfun(@BinnedDistribution,rawSensorDataTrain);
+
+T_aad = varfun(@AverageAbsoluteDistance, rawSensorDataTrain);
+
+accel_ara = AverageResultantAcceleration(rawSensorDataTrain{:, 1},...
+    rawSensorDataTrain{:, 2}, rawSensorDataTrain{:, 3});
+
+gyro_ara = AverageResultantAcceleration(rawSensorDataTrain{:, 4},...
+    rawSensorDataTrain{:, 5},rawSensorDataTrain{:, 6});
+
+T_ara  = table(accel_ara, accel_ara, accel_ara, gyro_ara, gyro_ara, gyro_ara);
+
 T_tbp  = varfun(@TimeBetweenPeaks,rawSensorDataTrain);
+T_bd = varfun(@BinnedDistribution,rawSensorDataTrain);
 
+humanActivityData = [T_mean, T_stdv, T_pca, T_aad, T_ara, T_tbp, T_bd];
 
-humanActivityData = [T_mean, T_stdv, T_pca, T_aad, T_ara, T_bd, T_tbp];
 humanActivityData.activity = trainActivity;
 
 %% Use the new features to train a model and assess its performance 
