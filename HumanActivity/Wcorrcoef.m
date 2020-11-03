@@ -7,6 +7,8 @@ function output = Wcorrcoef(data, varNames)
     
     splitmat = squeeze(num2cell(permute(y, [1 3 2]), [1 2]));
     
+    % Get rid of the diagonals, since these are always 1 and classifiers
+    % don't like them.
     for i = 1:size(data, 3)
        splitmat{i}(:, i) = [];
     end
