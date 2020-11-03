@@ -94,7 +94,18 @@ T_ara  = table(accel_ara, accel_ara, accel_ara, gyro_ara, gyro_ara, gyro_ara);
 T_tbp  = varfun(@TimeBetweenPeaks,rawSensorDataTrain);
 T_bd = varfun(@BinnedDistribution,rawSensorDataTrain);
 
-humanActivityData = [T_mean, T_stdv, T_pca, T_aad, T_ara, T_tbp, T_bd];
+T_var = varfun(@Wvar, rawSensorDataTrain);
+T_iqr = varfun(@Wiqr, rawSensorDataTrain);
+T_mad = varfun(@Wmad, rawSensorDataTrain);
+T_corrcoef = Wcorrcoef(cat(3, rawSensorDataTrain{1, :}, rawSensorDataTrain{2, :},...
+    rawSensorDataTrain{3, :}, rawSensorDataTrain{4, :}, rawSensorDataTrain{5, :},...
+    rawSensorDataTrain{6, :}));
+
+T_entropy = varfun(@Wentropy, rawSensorDataTrain);
+T_kurtosis = varfun(@Wkurtosis, rawSensorDataTrain);
+
+humanActivityData = [T_mean, T_stdv, T_pca, T_aad, T_ara, T_tbp, T_bd,...
+    T_var, T_iqr, T_mad, T_corrcoef, T_entropy, T_kurtosis];
 
 humanActivityData.activity = trainActivity;
 
@@ -124,8 +135,18 @@ T_ara  = varfun(@AverageResultantAcceleration,rawSensorDataTest);
 T_bd = varfun(@BinnedDistribution,rawSensorDataTest);
 T_tbp  = varfun(@TimeBetweenPeaks,rawSensorDataTest);
 
+T_var = varfun(@Wvar, rawSensorDataTest);
+T_iqr = varfun(@Wiqr, rawSensorDataTest);
+T_mad = varfun(@Wmad, rawSensorDataTest);
+T_corrcoef = Wcorrcoef(cat(3, rawSensorDataTest{1, :}, rawSensorDataTest{2, :},...
+    rawSensorDataTest{3, :}, rawSensorDataTest{4, :}, rawSensorDataTest{5, :},...
+    rawSensorDataTest{6, :}));
 
-humanActivityData = [T_mean, T_stdv, T_pca, T_aad, T_ara, T_bd, T_tbp];
+T_entropy = varfun(@Wentropy, rawSensorDataTest);
+T_kurtosis = varfun(@Wkurtosis, rawSensorDataTest);
+
+humanActivityData = [T_mean, T_stdv, T_pca, T_aad, T_ara, T_tbp, T_bd,...
+    T_var, T_iqr, T_mad, T_corrcoef, T_entropy, T_kurtosis];
 humanActivityData.activity = testActivity;
 
 % Step 3: Use trained model to predict activity on new sensor data
