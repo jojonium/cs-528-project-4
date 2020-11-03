@@ -124,13 +124,12 @@ if ~exist(trainingFeaturesFile, 'file')
         end
     end
     
+    humanActivityDataTrain.activity = trainActivity;
     save(trainingFeaturesFile, 'humanActivityDataTrain');
     
 else
     load(trainingFeaturesFile)
 end
-
-humanActivityDataTrain.activity = trainActivity;
 
 %% Use the new features to train a model and assess its performance 
 classificationLearner
@@ -197,12 +196,12 @@ if ~exist(testFeaturesFile, 'file')
         end
     end
     
+    humanActivityDataTest.activity = testActivity;
     save(testFeaturesFile, 'humanActivityDataTest')
     
 else
     load(testFeaturesFile) 
 end
-humanActivityDataTest.activity = testActivity;
 
 %% Step 3: Use trained model to predict activity on new sensor data
 % Make sure that you've exported 'trainedClassifier' from
