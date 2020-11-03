@@ -76,38 +76,53 @@ humanActivityData.activity = trainActivity;
 classificationLearner
 
 %% Additional Feature Extraction
+trainingFeaturesFile = 'trainingFeatures.mat';
 
-T_mean = varfun(@Wmean, rawSensorDataTrain);
-T_stdv = varfun(@Wstd,rawSensorDataTrain);
-T_pca  = varfun(@Wpca1,rawSensorDataTrain);
+if ~exist(trainingFeaturesFile, 'file')
 
-T_aad = varfun(@AverageAbsoluteDistance, rawSensorDataTrain);
+    T_mean = varfun(@Wmean, rawSensorDataTrain);
+    T_stdv = varfun(@Wstd,rawSensorDataTrain);
+    T_pca  = varfun(@Wpca1,rawSensorDataTrain);
 
-accel_ara = AverageResultantAcceleration(rawSensorDataTrain{:, 1},...
-    rawSensorDataTrain{:, 2}, rawSensorDataTrain{:, 3});
+    T_aad = varfun(@AverageAbsoluteDistance, rawSensorDataTrain);
 
-gyro_ara = AverageResultantAcceleration(rawSensorDataTrain{:, 4},...
-    rawSensorDataTrain{:, 5},rawSensorDataTrain{:, 6});
+    accel_ara = AverageResultantAcceleration(rawSensorDataTrain{:, 1},...
+        rawSensorDataTrain{:, 2}, rawSensorDataTrain{:, 3});
 
-T_ara  = table(accel_ara, accel_ara, accel_ara, gyro_ara, gyro_ara, gyro_ara);
+    gyro_ara = AverageResultantAcceleration(rawSensorDataTrain{:, 4},...
+        rawSensorDataTrain{:, 5},rawSensorDataTrain{:, 6});
 
-T_tbp  = varfun(@TimeBetweenPeaks,rawSensorDataTrain);
-T_bd = varfun(@BinnedDistribution,rawSensorDataTrain);
+    T_ara  = table(accel_ara, accel_ara, accel_ara, gyro_ara, gyro_ara, gyro_ara);
 
-T_var = varfun(@Wvar, rawSensorDataTrain);
-T_iqr = varfun(@Wiqr, rawSensorDataTrain);
-T_mad = varfun(@Wmad, rawSensorDataTrain);
-T_corrcoef = Wcorrcoef(cat(3, rawSensorDataTrain{1, :}, rawSensorDataTrain{2, :},...
-    rawSensorDataTrain{3, :}, rawSensorDataTrain{4, :}, rawSensorDataTrain{5, :},...
-    rawSensorDataTrain{6, :}));
+    T_tbp  = varfun(@TimeBetweenPeaks,rawSensorDataTrain);
+    T_bd = varfun(@BinnedDistribution,rawSensorDataTrain);
 
-T_entropy = varfun(@Wentropy, rawSensorDataTrain);
-T_kurtosis = varfun(@Wkurtosis, rawSensorDataTrain);
+    T_var = varfun(@Wvar, rawSensorDataTrain);
+    T_iqr = varfun(@Wiqr, rawSensorDataTrain);
+    T_mad = varfun(@Wmad, rawSensorDataTrain);
 
-humanActivityData = [T_mean, T_stdv, T_pca, T_aad, T_ara, T_tbp, T_bd,...
-    T_var, T_iqr, T_mad, T_corrcoef, T_entropy, T_kurtosis];
+    corr_var_names_train = cell(1, 6);
+    for i = 1:size(rawSensorDataTrain, 2)
+        corr_var_names_train(i) = {strcat('Wcorr_', rawSensorDataTrain.Properties.VariableNames{i})};
+    end
 
-humanActivityData.activity = trainActivity;
+    T_corrcoef = Wcorrcoef(cat(3, rawSensorDataTrain{:, 1}, rawSensorDataTrain{:, 2},...
+        rawSensorDataTrain{:, 3}, rawSensorDataTrain{:, 4}, rawSensorDataTrain{:, 5},...
+        rawSensorDataTrain{:, 6}), corr_var_names_train);
+
+    T_entropy = varfun(@Wentropy, rawSensorDataTrain);
+    T_kurtosis = varfun(@Wkurtosis, rawSensorDataTrain);
+
+    humanActivityDataTrain = [T_mean, T_stdv, T_pca, T_aad, T_ara, T_tbp, T_bd,...
+        T_var, T_iqr, T_mad, T_corrcoef, T_entropy, T_kurtosis];
+    
+    save(trainingFeaturesFile, 'humanActivityDataTrain');
+    
+else
+    load(trainingFeaturesFile)
+end
+
+humanActivityDataTrain.activity = trainActivity;
 
 %% Use the new features to train a model and assess its performance 
 classificationLearner
@@ -127,32 +142,56 @@ rawSensorDataTest = table(...
     body_gyro_x_test, body_gyro_y_test, body_gyro_z_test);
 
 % Step 2: Extract features from raw sensor data
-T_mean = varfun(@Wmean, rawSensorDataTest);
-T_stdv = varfun(@Wstd,rawSensorDataTest);
-T_pca  = varfun(@Wpca1,rawSensorDataTest);
-T_aad = varfun(@AverageAbsoluteDistance,rawSensorDataTest);
-T_ara  = varfun(@AverageResultantAcceleration,rawSensorDataTest);
-T_bd = varfun(@BinnedDistribution,rawSensorDataTest);
-T_tbp  = varfun(@TimeBetweenPeaks,rawSensorDataTest);
 
-T_var = varfun(@Wvar, rawSensorDataTest);
-T_iqr = varfun(@Wiqr, rawSensorDataTest);
-T_mad = varfun(@Wmad, rawSensorDataTest);
-T_corrcoef = Wcorrcoef(cat(3, rawSensorDataTest{1, :}, rawSensorDataTest{2, :},...
-    rawSensorDataTest{3, :}, rawSensorDataTest{4, :}, rawSensorDataTest{5, :},...
-    rawSensorDataTest{6, :}));
+testFeaturesFile = 'testFeatures.mat';
 
-T_entropy = varfun(@Wentropy, rawSensorDataTest);
-T_kurtosis = varfun(@Wkurtosis, rawSensorDataTest);
+if ~exist(testFeaturesFile, 'file')
 
-humanActivityData = [T_mean, T_stdv, T_pca, T_aad, T_ara, T_tbp, T_bd,...
-    T_var, T_iqr, T_mad, T_corrcoef, T_entropy, T_kurtosis];
-humanActivityData.activity = testActivity;
+    T_mean = varfun(@Wmean, rawSensorDataTest);
+    T_stdv = varfun(@Wstd,rawSensorDataTest);
+    T_pca  = varfun(@Wpca1,rawSensorDataTest);
+    T_aad = varfun(@AverageAbsoluteDistance,rawSensorDataTest);
+    
+    accel_ara = AverageResultantAcceleration(rawSensorDataTest{:, 1},...
+        rawSensorDataTest{:, 2}, rawSensorDataTest{:, 3});
 
-% Step 3: Use trained model to predict activity on new sensor data
+    gyro_ara = AverageResultantAcceleration(rawSensorDataTest{:, 4},...
+        rawSensorDataTest{:, 5},rawSensorDataTest{:, 6});
+
+    T_ara  = table(accel_ara, accel_ara, accel_ara, gyro_ara, gyro_ara, gyro_ara);
+    T_bd = varfun(@BinnedDistribution,rawSensorDataTest);
+    T_tbp  = varfun(@TimeBetweenPeaks,rawSensorDataTest);
+
+    T_var = varfun(@Wvar, rawSensorDataTest);
+    T_iqr = varfun(@Wiqr, rawSensorDataTest);
+    T_mad = varfun(@Wmad, rawSensorDataTest);
+
+    corr_var_names_test = cell(1, 6);
+    for i = 1:size(rawSensorDataTest, 2)
+        corr_var_names_test(i) = {strcat('Wcorr_', rawSensorDataTest.Properties.VariableNames{i})};
+    end
+
+    T_corrcoef = Wcorrcoef(cat(3, rawSensorDataTest{:, 1}, rawSensorDataTest{:, 2},...
+        rawSensorDataTest{:, 3}, rawSensorDataTest{:, 4}, rawSensorDataTest{:, 5},...
+        rawSensorDataTest{:, 6}), corr_var_names_test);
+
+    T_entropy = varfun(@Wentropy, rawSensorDataTest);
+    T_kurtosis = varfun(@Wkurtosis, rawSensorDataTest);
+
+    humanActivityDataTest = [T_mean, T_stdv, T_pca, T_aad, T_ara, T_tbp, T_bd,...
+        T_var, T_iqr, T_mad, T_corrcoef, T_entropy, T_kurtosis];
+    
+    save(testFeaturesFile, 'humanActivityDataTest')
+    
+else
+    load(testFeaturesFile) 
+end
+humanActivityDataTest.activity = testActivity;
+
+%% Step 3: Use trained model to predict activity on new sensor data
 % Make sure that you've exported 'trainedClassifier' from
 % ClassificationLearner
-plotActivityResults(trainedClassifier,rawSensorDataTest,humanActivityData,0.1)
+plotActivityResults(trainedClassifier,rawSensorDataTest,humanActivityDataTest,0.1)
 
 %%
 % 
