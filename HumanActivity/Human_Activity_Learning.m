@@ -116,6 +116,14 @@ if ~exist(trainingFeaturesFile, 'file')
     humanActivityDataTrain = [T_mean, T_stdv, T_pca, T_aad, T_ara, T_tbp, T_bd,...
         T_var, T_iqr, T_mad, T_corrcoef, T_entropy, T_kurtosis];
     
+    for i = 1:size(humanActivityDataTrain, 2)
+        varname = humanActivityDataTrain.Properties.VariableNames{i};
+        if endsWith(varname, '_train')
+            varname = varname(1:end-6);
+            humanActivityDataTrain.Properties.VariableNames{i} = varname;
+        end
+    end
+    
     save(trainingFeaturesFile, 'humanActivityDataTrain');
     
 else
@@ -180,6 +188,14 @@ if ~exist(testFeaturesFile, 'file')
 
     humanActivityDataTest = [T_mean, T_stdv, T_pca, T_aad, T_ara, T_tbp, T_bd,...
         T_var, T_iqr, T_mad, T_corrcoef, T_entropy, T_kurtosis];
+    
+    for i = 1:size(humanActivityDataTest, 2)
+        varname = humanActivityDataTest.Properties.VariableNames{i};
+        if endsWith(varname, '_test')
+            varname = varname(1:end-5);
+            humanActivityDataTest.Properties.VariableNames{i} = varname;
+        end
+    end
     
     save(testFeaturesFile, 'humanActivityDataTest')
     

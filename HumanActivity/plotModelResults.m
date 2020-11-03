@@ -48,7 +48,7 @@ ann2 = annotation(fig,'textbox',[ax1.Position(1) ax1.Position(2)+0.04 ax1.Positi
     'BackgroundColor',[0 0.7 0.3],'HorizontalAlignment','Center','VerticalAlignment','middle','FaceAlpha',0.5);
 
 %% Loop through the raw data and plot the sensor values
-try
+
 for ii = 600:height(humanActivityTest)
     
     activity = predict(mdl,humanActivityTest{ii,1:end-1});
@@ -74,9 +74,6 @@ for ii = 600:height(humanActivityTest)
     drawnow
     pause(delay)
 end
-catch err %#ok<NASGU>
-end
-
 function cname = getClassifierName(trainedClassifier)
     cname = class(trainedClassifier);
     if isa(trainedClassifier,'ClassificationECOC')
